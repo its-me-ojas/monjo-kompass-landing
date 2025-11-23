@@ -74,6 +74,9 @@ export default function Hero() {
           <Button variant="outline" size="lg" className="text-base h-12 px-8">
             View on GitHub
           </Button>
+          <Button variant="ghost" size="lg" className="text-base h-12 px-8 text-mongodb hover:text-mongodb/80 hover:bg-mongodb/10" asChild>
+            <a href="/blog">Read Blog</a>
+          </Button>
         </motion.div>
 
         {/* Status Indicator */}
