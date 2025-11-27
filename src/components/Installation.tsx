@@ -7,10 +7,15 @@ import { Button } from "@/components/ui/button";
 
 export default function Installation() {
   const [copied, setCopied] = useState(false);
-  const command = "cargo install kompass";
+  const [method, setMethod] = useState<'cargo' | 'source'>('cargo');
+
+  const commands = {
+    cargo: "cargo install monjo-kompass",
+    source: "git clone https://github.com/its-me-ojas/monjo-kompass.git\ncd monjo-kompass\ncargo build --release"
+  };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(command);
+    navigator.clipboard.writeText(commands[method]);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -56,18 +61,65 @@ export default function Installation() {
               Ready to <span className="text-mongodb">Deploy</span>?
             </h2>
 
-            <div className="relative max-w-xl mx-auto group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-mongodb via-rust to-mongodb rounded-lg opacity-20 group-hover:opacity-50 blur transition duration-500 animate-gradient-x" />
-              <div className="relative flex flex-col sm:flex-row items-center justify-between bg-black rounded-lg p-2 border border-white/10 gap-2 sm:gap-0">
-                <div className="flex items-center gap-4 px-4 py-3 font-mono text-base md:text-lg w-full text-left overflow-x-auto whitespace-nowrap">
-                  <span className="text-rust select-none">$</span>
-                  <span className="text-white">{command}</span>
+            {/* Method Toggle */}
+            <div className="flex justify-center gap-4 mb-8 relative z-10">
+              <button
+                onClick={() => setMethod('cargo')}
+                className={`px-4 py-2 rounded-lg font-mono text-sm transition-all duration-300 ${
+                  method === 'cargo' 
+                    ? 'bg-mongodb/20 text-mongodb border border-mongodb/50 shadow-[0_0_15px_rgba(0,237,100,0.3)]' 
+                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                CRATES.IO
+              </button>
+              <button
+                onClick={() => setMethod('source')}
+                className={`px-4 py-2 rounded-lg font-mono text-sm transition-all duration-300 ${
+                  method === 'source' 
+                    ? 'bg-rust/20 text-rust border border-rust/50 shadow-[0_0_15px_rgba(200,50,0,0.3)]' 
+                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                SOURCE
+              </button>
+            </div>
+
+            <div className="relative max-w-2xl mx-auto group">
+              <div className={`absolute -inset-1 bg-gradient-to-r rounded-lg opacity-20 group-hover:opacity-50 blur transition duration-500 animate-gradient-x ${
+                method === 'cargo' ? 'from-mongodb via-green-400 to-mongodb' : 'from-rust via-orange-500 to-rust'
+              }`} />
+              <div className="relative flex flex-col sm:flex-row items-stretch justify-between bg-black rounded-lg p-2 border border-white/10 gap-2 sm:gap-0">
+                <div className="flex flex-col justify-center px-4 py-3 font-mono text-sm md:text-base w-full text-left overflow-x-auto">
+                  {method === 'cargo' ? (
+                    <div className="flex items-center gap-3 whitespace-nowrap">
+                      <span className="text-mongodb select-none">$</span>
+                      <span className="text-white">{commands.cargo}</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-3 whitespace-nowrap">
+                        <span className="text-rust select-none">$</span>
+                        <span className="text-white/80">git clone https://github.com/its-me-ojas/monjo-kompass.git</span>
+                      </div>
+                      <div className="flex items-center gap-3 whitespace-nowrap">
+                        <span className="text-rust select-none">$</span>
+                        <span className="text-white/80">cd monjo-kompass</span>
+                      </div>
+                      <div className="flex items-center gap-3 whitespace-nowrap">
+                        <span className="text-rust select-none">$</span>
+                        <span className="text-white">cargo build --release</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={handleCopy}
-                  className="shrink-0 w-full sm:w-10 hover:bg-mongodb/20 hover:text-mongodb transition-all duration-300"
+                  className={`shrink-0 w-full sm:w-12 h-auto self-stretch hover:bg-white/5 transition-all duration-300 ${
+                    method === 'cargo' ? 'hover:text-mongodb' : 'hover:text-rust'
+                  }`}
                 >
                   <AnimatePresence mode="wait">
                     {copied ? (

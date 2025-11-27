@@ -1,14 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Terminal, Plus } from "lucide-react";
+import { ArrowRight, Terminal, Plus, Star } from "lucide-react";
 import { renderCanvas } from "@/components/ui/canvas";
 import { Button } from "@/components/ui/button";
 
 export default function Hero() {
+  const [stars, setStars] = useState<number | null>(null);
+
   useEffect(() => {
     renderCanvas();
+    
+    // Fetch GitHub stars
+    fetch("https://api.github.com/repos/its-me-ojas/monjo-kompass")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.stargazers_count !== undefined) {
+          setStars(data.stargazers_count);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch GitHub stars:", error);
+      });
   }, []);
 
   return (
@@ -71,8 +85,16 @@ export default function Hero() {
           <Button size="lg" className="text-base h-12 px-8">
             Get Started
           </Button>
-          <Button variant="outline" size="lg" className="text-base h-12 px-8">
-            View on GitHub
+          <Button variant="outline" size="lg" className="text-base h-12 px-8 relative group" asChild>
+            <a href="https://github.com/its-me-ojas/monjo-kompass" target="_blank" rel="noopener noreferrer">
+              <span>View on GitHub</span>
+              {stars !== null && (
+                <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mongodb/10 text-mongodb text-sm font-mono border border-mongodb/20 group-hover:bg-mongodb/20 transition-colors">
+                  <Star className="w-3 h-3 fill-mongodb" />
+                  {stars}
+                </span>
+              )}
+            </a>
           </Button>
           <Button variant="ghost" size="lg" className="text-base h-12 px-8 text-mongodb hover:text-mongodb/80 hover:bg-mongodb/10" asChild>
             <a href="/blog">Read Blog</a>

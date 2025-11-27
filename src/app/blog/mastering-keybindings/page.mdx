@@ -1,0 +1,475 @@
+---
+title: Mastering Monjo-Kompass - Essential Keybindings and Workflows
+date: 2025/11/27
+description: Complete guide to keyboard shortcuts, power user tips, and efficient workflows for maximum productivity.
+tag: tutorial
+author: Monjo Team
+---
+
+# Mastering Monjo-Kompass: Essential Keybindings and Workflows
+
+Monjo-Kompass is built for keyboard warriors. This guide will transform you from a beginner to a power user.
+
+## Core Navigation
+
+### Universal Keybindings
+
+These work across all screens:
+
+| Key | Action |
+|-----|--------|
+| `↑` / `k` | Move up |
+| `↓` / `j` | Move down |
+| `Enter` | Select / Open |
+| `Backspace` | Go back |
+| `q` | Quit application |
+| `Ctrl+C` | Force quit |
+| `r` | Refresh current view |
+
+### Why Vim-like?
+
+If you're familiar with Vim, you'll feel right at home:
+- `j/k` for vertical navigation
+- `h/l` for horizontal navigation (where applicable)
+- No mouse required
+- Muscle memory transfers from your editor
+
+## Screen-by-Screen Guide
+
+### Connection Screen
+
+**Goal**: Connect to MongoDB quickly
+
+```
+┌─ Connection ─────────────────────────┐
+│ Enter MongoDB URI:                   │
+│ mongodb://localhost:27017            │
+│                                      │
+│ Recent Connections:                  │
+│ > mongodb://localhost:27017          │
+│   mongodb+srv://cluster.mongodb.net  │
+└──────────────────────────────────────┘
+```
+
+**Keybindings**:
+- `Ctrl+V` - Paste connection string from clipboard
+- `↑/↓` - Navigate connection history
+- `Enter` - Connect to selected URI
+- `Esc` - Clear input field
+
+**Power Tip**: Save frequently-used connections by connecting once. They'll appear in your history automatically.
+
+### Database List
+
+**Goal**: Browse and select databases
+
+```
+┌─ Databases ──────────────────────────┐
+│ > production (45 collections)        │
+│   staging (23 collections)           │
+│   development (12 collections)       │
+│   analytics (8 collections)          │
+└──────────────────────────────────────┘
+```
+
+**Keybindings**:
+- `j/k` or `↑/↓` - Navigate databases
+- `Enter` - Open selected database
+- `r` - Refresh database list
+- `Backspace` - Return to connection screen
+
+**Workflow Example**:
+```
+1. Connect to server
+2. Press 'j' three times to select 'analytics'
+3. Press Enter to view collections
+```
+
+### Collection List
+
+**Goal**: Explore collections and their metadata
+
+```
+┌─ Collections: analytics ─────────────┐
+│ > events (1.2M documents)            │
+│   users (45K documents)              │
+│   sessions (890K documents)          │
+│   metrics (2.1M documents)           │
+└──────────────────────────────────────┘
+```
+
+**Keybindings**:
+- `j/k` or `↑/↓` - Navigate collections
+- `Enter` - View documents
+- `f` - Filter collections by name
+- `Backspace` - Return to database list
+
+**Power Tip**: Use `f` to quickly find collections in large databases:
+```
+1. Press 'f'
+2. Type 'user'
+3. Only 'users' collection shows
+4. Press Enter to open
+```
+
+### Document View
+
+**Goal**: Inspect and navigate documents
+
+```
+┌─ Documents: events ──────────────────┐
+│ > {                                  │
+│     "_id": ObjectId("..."),          │
+│     "event": "page_view",            │
+│     "user_id": "12345",              │
+│     "timestamp": ISODate("...")      │
+│   }                                  │
+│                                      │
+│   {                                  │
+│     "_id": ObjectId("..."),          │
+│     "event": "click",                │
+│     ...                              │
+│   }                                  │
+└──────────────────────────────────────┘
+```
+
+**Keybindings**:
+- `j/k` or `↑/↓` - Navigate documents
+- `PgUp/PgDn` - Scroll document content
+- `f` - Filter documents
+- `q` - Query mode
+- `e` - Export documents
+- `Backspace` - Return to collection list
+
+## Advanced Features
+
+### Document Filtering
+
+**Use Case**: Find specific documents quickly
+
+**Workflow**:
+```
+1. In document view, press 'f'
+2. Enter filter: {"status": "active"}
+3. Press Enter
+4. Only matching documents show
+```
+
+**Filter Examples**:
+```json
+// Find by field value
+{"status": "active"}
+
+// Find by ID
+{"_id": ObjectId("507f1f77bcf86cd799439011")}
+
+// Find with operators
+{"age": {"$gte": 18}}
+
+// Multiple conditions
+{"status": "active", "role": "admin"}
+```
+
+**Clear Filter**: Press `Esc` or `Backspace`
+
+### Custom Query Mode
+
+**Use Case**: Execute complex MongoDB queries
+
+**Workflow**:
+```
+1. Press 'q' in document view
+2. Enter query: db.users.find({age: {$gte: 18}}).limit(10)
+3. Press Enter
+4. Results display in document view
+```
+
+**Query Examples**:
+```javascript
+// Find with projection
+db.users.find({}, {name: 1, email: 1})
+
+// Sort results
+db.events.find().sort({timestamp: -1}).limit(100)
+
+// Count documents
+db.users.countDocuments({status: "active"})
+
+// Distinct values
+db.events.distinct("event_type")
+```
+
+### Aggregation Pipelines
+
+**Use Case**: Complex data transformations
+
+**Workflow**:
+```
+1. Press 'q' in document view
+2. Enter aggregation:
+   db.events.aggregate([
+     {$match: {event: "purchase"}},
+     {$group: {_id: "$user_id", total: {$sum: "$amount"}}}
+   ])
+3. Press Enter
+4. Results display
+```
+
+**Pipeline Examples**:
+```javascript
+// Group and count
+[
+  {$group: {_id: "$status", count: {$sum: 1}}}
+]
+
+// Filter and sort
+[
+  {$match: {age: {$gte: 18}}},
+  {$sort: {created_at: -1}},
+  {$limit: 100}
+]
+
+// Complex aggregation
+[
+  {$match: {date: {$gte: ISODate("2024-01-01")}}},
+  {$group: {
+    _id: {$dateToString: {format: "%Y-%m-%d", date: "$date"}},
+    revenue: {$sum: "$amount"},
+    count: {$sum: 1}
+  }},
+  {$sort: {_id: -1}}
+]
+```
+
+### Export Functionality
+
+**Use Case**: Save query results for analysis
+
+**Workflow**:
+```
+1. Navigate to documents or run a query
+2. Press 'e'
+3. Choose format (JSON/CSV/BSON)
+4. Enter filename
+5. Press Enter
+6. File saved to current directory
+```
+
+**Export Formats**:
+- **JSON**: Human-readable, great for sharing
+- **CSV**: Import into Excel/Google Sheets
+- **BSON**: Native MongoDB format, preserves types
+
+## Clipboard Integration
+
+### Paste Connection Strings
+
+**Workflow**:
+```
+1. Copy MongoDB URI from anywhere
+   (e.g., MongoDB Atlas dashboard)
+2. Open Monjo-Kompass
+3. Press Ctrl+V
+4. URI auto-fills
+5. Press Enter to connect
+```
+
+**Supported Formats**:
+```
+mongodb://localhost:27017
+mongodb://user:pass@localhost:27017/admin
+mongodb+srv://user:pass@cluster.mongodb.net/
+```
+
+### Copy Document Data
+
+**Workflow**:
+```
+1. Navigate to a document
+2. Press 'c' to copy
+3. Document JSON copied to clipboard
+4. Paste into your code editor
+```
+
+## Power User Workflows
+
+### Workflow 1: Quick Database Inspection
+
+**Goal**: Check production database health
+
+```
+Time: ~10 seconds
+
+1. Ctrl+V (paste production URI)
+2. Enter (connect)
+3. j j j (navigate to target database)
+4. Enter (open database)
+5. r (refresh to see latest stats)
+6. Scan collection counts
+7. q (quit)
+```
+
+### Workflow 2: Find and Export User Data
+
+**Goal**: Export specific user records
+
+```
+Time: ~30 seconds
+
+1. Connect to database
+2. Navigate to 'users' collection
+3. Press 'f'
+4. Enter: {"email": {"$regex": "@company.com"}}
+5. Press Enter (filter applied)
+6. Press 'e' (export)
+7. Choose JSON format
+8. Enter filename: company_users.json
+9. Press Enter (exported)
+```
+
+### Workflow 3: Analyze Event Data
+
+**Goal**: Get event counts by type
+
+```
+Time: ~45 seconds
+
+1. Navigate to 'events' collection
+2. Press 'q' (query mode)
+3. Enter aggregation:
+   db.events.aggregate([
+     {$group: {_id: "$event_type", count: {$sum: 1}}},
+     {$sort: {count: -1}}
+   ])
+4. Press Enter
+5. Review results
+6. Press 'e' to export if needed
+```
+
+### Workflow 4: Connection Switching
+
+**Goal**: Switch between dev/staging/prod
+
+```
+Time: ~5 seconds per switch
+
+1. Press Backspace until connection screen
+2. Press ↑/↓ to select from history
+3. Press Enter to connect
+4. Instantly connected to new environment
+```
+
+## Productivity Tips
+
+### 1. Use Connection History
+
+Never type the same URI twice:
+- First connection: Type or paste URI
+- Subsequent connections: Select from history
+- Saves ~20 seconds per connection
+
+### 2. Master Filtering
+
+Instead of scrolling through thousands of documents:
+```
+Without filtering: 2-3 minutes to find document
+With filtering: 5 seconds
+```
+
+### 3. Learn Query Mode
+
+GUI query builders are slow. Command line is fast:
+```
+GUI: Click, select, type, click, wait... (30+ seconds)
+Query mode: Type query, Enter (5 seconds)
+```
+
+### 4. Keyboard-Only Navigation
+
+Never reach for the mouse:
+```
+Mouse workflow: 15-20 actions per minute
+Keyboard workflow: 40-60 actions per minute
+```
+
+### 5. Use Vim Keybindings
+
+If you use Vim/Neovim:
+- Your muscle memory works instantly
+- No context switching
+- Stay in the flow
+
+## Troubleshooting
+
+### Connection Issues
+
+**Problem**: "Connection failed"
+
+**Solutions**:
+1. Check URI format
+2. Verify network connectivity
+3. Check MongoDB server status
+4. Verify credentials
+
+### Filter Not Working
+
+**Problem**: Filter returns no results
+
+**Solutions**:
+1. Check JSON syntax
+2. Verify field names (case-sensitive)
+3. Use `$regex` for partial matches
+4. Clear filter with Esc and retry
+
+### Query Syntax Error
+
+**Problem**: "Query failed: syntax error"
+
+**Solutions**:
+1. Verify MongoDB query syntax
+2. Check for missing commas/brackets
+3. Test query in MongoDB shell first
+4. Use simpler query and build up
+
+## Cheat Sheet
+
+Quick reference for common operations:
+
+```
+Navigation:
+  j/k, ↑/↓  - Move up/down
+  Enter     - Select
+  Backspace - Go back
+  q         - Quit
+
+Actions:
+  f         - Filter
+  q         - Query mode
+  e         - Export
+  r         - Refresh
+  c         - Copy
+  Ctrl+V    - Paste
+
+Screens:
+  Connection → Database → Collection → Documents
+  
+Shortcuts:
+  Ctrl+C    - Force quit
+  Esc       - Cancel/Clear
+  PgUp/PgDn - Scroll
+```
+
+## Conclusion
+
+Mastering Monjo-Kompass is about building muscle memory. After a few days:
+- Navigation becomes automatic
+- Queries flow from your fingers
+- You'll wonder how you used GUI tools
+
+**Next Steps**:
+1. Practice the basic workflows
+2. Memorize your most-used keybindings
+3. Explore query mode
+4. Share your own workflows with the community!
+
+Happy navigating! 🚀

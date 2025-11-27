@@ -4,31 +4,9 @@ import Link from 'next/link'
 export default async function BlogIndex() {
   let posts = await getPosts()
   
-  // Fallback hardcoded posts if none found
+  // No fallback posts
   if (posts.length === 0) {
-    posts = [
-      {
-        title: 'Introducing Monjo Kompass',
-        date: '2025/11/24',
-        description: 'The MongoDB client designed for the terminal era.',
-        tag: 'announcement',
-        route: '/blog/introducing-monjo-kompass'
-      },
-      {
-        title: 'Mastering Flow State with Monjo Kompass',
-        date: '2025/11/25',
-        description: 'How to stay in the zone while managing your data.',
-        tag: 'productivity',
-        route: '/blog/mastering-flow-state'
-      },
-      {
-        title: 'The Future of Productivity',
-        date: '2025/11/26',
-        description: 'Why the terminal is making a comeback.',
-        tag: 'thoughts',
-        route: '/blog/future-of-productivity'
-      }
-    ]
+    console.log('No posts found')
   }
   
   return (

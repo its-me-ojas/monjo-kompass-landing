@@ -1,121 +1,216 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, X, Minus, Zap, Database, Terminal } from "lucide-react";
+import { Check, X, Zap, Cpu, HardDrive, Terminal, MousePointer2 } from "lucide-react";
 import clsx from "clsx";
 
+const metrics = [
+  { 
+    name: "Startup Time", 
+    kompass: 50, 
+    compass: 4000, 
+    unit: "ms",
+    icon: Zap,
+    description: "Instant launch vs loading screen"
+  },
+  { 
+    name: "Memory Usage", 
+    kompass: 10, 
+    compass: 300, 
+    unit: "MB",
+    icon: Cpu,
+    description: "Lightweight vs resource heavy"
+  },
+  { 
+    name: "Binary Size", 
+    kompass: 8, 
+    compass: 200, 
+    unit: "MB",
+    icon: HardDrive,
+    description: "Tiny footprint vs massive install"
+  }
+];
+
 const features = [
-  { name: "Startup Time", kompass: "Instant", compass: "Slow", cli: "Instant" },
-  { name: "Memory Usage", kompass: "~10MB", compass: "~300MB", cli: "~5MB" },
-  { name: "Mouse Support", kompass: true, compass: true, cli: false },
-  { name: "Visual Query Builder", kompass: true, compass: true, cli: false },
-  { name: "Keyboard Navigation", kompass: "Vim-like", compass: "Basic", cli: "Basic" },
-  { name: "Themeable", kompass: true, compass: false, cli: false },
+  { name: "Vim Keybindings", kompass: true, compass: false },
+  { name: "SSH Support", kompass: true, compass: false },
+  { name: "Mouse Support", kompass: false, compass: true },
+  { name: "Visual Query Builder", kompass: false, compass: true },
+  { name: "Terminal Integration", kompass: true, compass: false },
+  { name: "Scriptable", kompass: true, compass: false },
 ];
 
 export default function Comparison() {
   return (
-    <section className="py-32 px-4 relative overflow-hidden">
+    <section className="py-32 px-4 relative overflow-hidden bg-black">
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+      
       <div className="container mx-auto max-w-6xl relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             System <span className="text-mongodb">Analysis</span>
           </h2>
-          <p className="text-white/60 max-w-2xl mx-auto text-lg font-mono">
-            COMPARING PERFORMANCE METRICS
+          <p className="text-white/60 max-w-2xl mx-auto text-lg">
+            See why developers are switching to the terminal.
           </p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="relative bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]"
-        >
-          {/* HUD Header */}
-          <div className="overflow-x-auto">
-            <div className="min-w-[600px]">
-              <div className="grid grid-cols-4 p-6 border-b border-white/10 bg-white/5 font-mono text-sm tracking-wider">
-                <div className="flex items-center gap-2 text-white/40">
-                  <Database className="w-4 h-4" />
-                  <span>METRIC</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Performance Metrics */}
+          <div className="space-y-8">
+            <h3 className="text-xl font-bold text-white/80 flex items-center gap-3">
+              <Zap className="w-5 h-5 text-mongodb" />
+              Performance Metrics
+            </h3>
+            
+            {metrics.map((metric, index) => (
+              <motion.div
+                key={metric.name}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/5 border border-white/10 rounded-xl p-6 relative overflow-hidden group hover:border-mongodb/30 transition-colors"
+              >
+                <div className="flex justify-between items-start mb-6 relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-mongodb/10 rounded-lg text-mongodb">
+                      <metric.icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-white">{metric.name}</div>
+                      <div className="text-xs text-white/40">{metric.description}</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-center gap-2 text-mongodb bg-mongodb/10 rounded py-1 border border-mongodb/20">
-                  <Zap className="w-4 h-4" />
-                  <span>KOMPASS</span>
-                </div>
-                <div className="text-center text-white/40 flex items-center justify-center">GUI APPS</div>
-                <div className="text-center text-white/40 flex items-center justify-center">CLI</div>
-              </div>
 
-              {/* Grid Background */}
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:2rem_2rem] pointer-events-none" />
+                {/* Comparison Bars */}
+                <div className="space-y-4 relative z-10">
+                  {/* Kompass Bar */}
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-mongodb font-bold">Monjo-Kompass</span>
+                      <span className="text-mongodb">{metric.kompass}{metric.unit}</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: "100%" }} // Always full relative to itself for small values? No, let's scale visually
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, delay: 0.5 }}
+                        className="h-full bg-mongodb shadow-[0_0_10px_rgba(0,237,100,0.5)]"
+                        style={{ 
+                          width: `${(metric.kompass / Math.max(metric.kompass, metric.compass)) * 100}%` 
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Compass Bar */}
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-white/40">Standard GUI</span>
+                      <span className="text-white/40">{metric.compass}{metric.unit}</span>
+                    </div>
+                    <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: "100%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, delay: 0.7 }}
+                        className="h-full bg-white/20"
+                        style={{ 
+                          width: `${(metric.compass / Math.max(metric.kompass, metric.compass)) * 100}%` 
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Feature Matrix */}
+          <div className="space-y-8">
+            <h3 className="text-xl font-bold text-white/80 flex items-center gap-3">
+              <Terminal className="w-5 h-5 text-rust" />
+              Feature Matrix
+            </h3>
+
+            <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              <div className="grid grid-cols-3 p-4 border-b border-white/10 bg-white/5 text-xs font-mono tracking-wider text-white/40">
+                <div>FEATURE</div>
+                <div className="text-center text-mongodb">KOMPASS</div>
+                <div className="text-center">GUI APPS</div>
+              </div>
 
               {features.map((feature, index) => (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  key={feature.name}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: 0.2 + (index * 0.05) }}
                   className={clsx(
-                    "grid grid-cols-4 p-6 items-center border-b border-white/5 last:border-0 relative z-10 font-mono text-sm md:text-base hover:bg-white/5 transition-colors group",
+                    "grid grid-cols-3 p-4 items-center border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors",
                     index % 2 === 0 ? "bg-transparent" : "bg-white/[0.02]"
                   )}
                 >
-                  <div className="font-medium text-white/80 group-hover:text-white transition-colors">{feature.name}</div>
+                  <div className="text-sm font-medium text-white/80">{feature.name}</div>
                   
-                  {/* Kompass */}
-                  <div className="text-center flex justify-center font-bold text-mongodb group-hover:scale-110 transition-transform">
-                    {feature.kompass === true ? (
-                      <Check className="w-5 h-5" />
-                    ) : feature.kompass === false ? (
-                      <X className="w-5 h-5 text-red-500" />
+                  <div className="flex justify-center">
+                    {feature.kompass ? (
+                      <div className="w-6 h-6 rounded-full bg-mongodb/10 flex items-center justify-center text-mongodb">
+                        <Check className="w-4 h-4" />
+                      </div>
                     ) : (
-                      feature.kompass
+                      <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-white/20">
+                        <X className="w-4 h-4" />
+                      </div>
                     )}
                   </div>
 
-                  {/* GUI Apps */}
-                  <div className="text-center flex justify-center text-white/40">
-                    {feature.compass === true ? (
-                      <Check className="w-5 h-5" />
-                    ) : feature.compass === false ? (
-                      <X className="w-5 h-5" />
+                  <div className="flex justify-center">
+                    {feature.compass ? (
+                      <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white/60">
+                        <Check className="w-4 h-4" />
+                      </div>
                     ) : (
-                      feature.compass
-                    )}
-                  </div>
-
-                  {/* CLI */}
-                  <div className="text-center flex justify-center text-white/40">
-                    {feature.cli === true ? (
-                      <Check className="w-5 h-5" />
-                    ) : feature.cli === false ? (
-                      <Minus className="w-5 h-5" />
-                    ) : (
-                      feature.cli
+                      <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-white/20">
+                        <X className="w-4 h-4" />
+                      </div>
                     )}
                   </div>
                 </motion.div>
               ))}
             </div>
+
+            {/* Winner Badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.8 }}
+              className="mt-8 p-6 bg-gradient-to-r from-mongodb/10 to-transparent border border-mongodb/20 rounded-xl flex items-center gap-4"
+            >
+              <div className="p-3 bg-mongodb text-black rounded-full">
+                <Zap className="w-6 h-6 fill-current" />
+              </div>
+              <div>
+                <div className="font-bold text-white text-lg">The Clear Winner</div>
+                <div className="text-white/60 text-sm">
+                  Monjo-Kompass is <span className="text-mongodb font-bold">80x faster</span> and uses <span className="text-mongodb font-bold">30x less memory</span>.
+                </div>
+              </div>
+            </motion.div>
           </div>
-          
-          {/* Scanning Line */}
-          <motion.div
-            animate={{ top: ["0%", "100%", "0%"] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 w-full h-[1px] bg-mongodb/20 shadow-[0_0_10px_rgba(0,237,100,0.3)] pointer-events-none z-20"
-          />
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import Comparison from "@/components/Comparison";
+import Roadmap from "@/components/Roadmap";
 import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
 import Installation from "@/components/Installation";
@@ -30,6 +31,7 @@ export default function Home() {
         <Hero />
         <Features />
         <Comparison />
+        <Roadmap />
         <Testimonials />
         <FAQ />
         <Installation />

@@ -1,0 +1,793 @@
+---
+title: Advanced MongoDB Queries in the Terminal
+date: 2025/11/27
+description: Master query mode, aggregation pipelines, filtering, and export workflows in Monjo-Kompass.
+tag: tutorial
+author: Monjo Team
+---
+
+# Advanced MongoDB Queries in the Terminal
+
+Unlock the full power of MongoDB from your terminal with Monjo-Kompass's advanced query features.
+
+## Query Mode Basics
+
+### Entering Query Mode
+
+From any document view, press `q` to enter query mode:
+
+```
+┌─ Query Mode ─────────────────────────┐
+│ Enter MongoDB query:                 │
+│ db.users.find({})                    │
+│                                      │
+│ Press Enter to execute               │
+│ Press Esc to cancel                  │
+└──────────────────────────────────────┘
+```
+
+### Query Syntax
+
+Monjo-Kompass supports standard MongoDB shell syntax:
+
+```javascript
+// Basic find
+db.collection.find({field: "value"})
+
+// Find with options
+db.collection.find({}, {projection}).limit(10).sort({field: -1})
+
+// Count
+db.collection.countDocuments({filter})
+
+// Distinct
+db.collection.distinct("field")
+
+// Aggregation
+db.collection.aggregate([{$match: {}}, {$group: {}}])
+```
+
+## Find Queries
+
+### Simple Queries
+
+**Find all documents**:
+```javascript
+db.users.find({})
+```
+
+**Find with filter**:
+```javascript
+db.users.find({status: "active"})
+```
+
+**Find with multiple conditions**:
+```javascript
+db.users.find({
+  status: "active",
+  role: "admin"
+})
+```
+
+### Query Operators
+
+**Comparison Operators**:
+```javascript
+// Greater than
+db.users.find({age: {$gt: 18}})
+
+// Greater than or equal
+db.users.find({age: {$gte: 18}})
+
+// Less than
+db.users.find({age: {$lt: 65}})
+
+// Not equal
+db.users.find({status: {$ne: "deleted"}})
+
+// In array
+db.users.find({role: {$in: ["admin", "moderator"]}})
+
+// Not in array
+db.users.find({status: {$nin: ["banned", "deleted"]}})
+```
+
+**Logical Operators**:
+```javascript
+// AND (implicit)
+db.users.find({
+  age: {$gte: 18},
+  status: "active"
+})
+
+// OR
+db.users.find({
+  $or: [
+    {role: "admin"},
+    {role: "moderator"}
+  ]
+})
+
+// NOT
+db.users.find({
+  age: {$not: {$lt: 18}}
+})
+
+// NOR
+db.users.find({
+  $nor: [
+    {status: "banned"},
+    {status: "deleted"}
+  ]
+})
+```
+
+**Element Operators**:
+```javascript
+// Field exists
+db.users.find({email: {$exists: true}})
+
+// Field type
+db.users.find({age: {$type: "number"}})
+```
+
+**Array Operators**:
+```javascript
+// Array contains
+db.users.find({tags: "premium"})
+
+// Array contains all
+db.users.find({tags: {$all: ["premium", "verified"]}})
+
+// Array size
+db.users.find({tags: {$size: 3}})
+
+// Element match
+db.orders.find({
+  items: {
+    $elemMatch: {
+      price: {$gt: 100},
+      quantity: {$gte: 2}
+    }
+  }
+})
+```
+
+**String Operators**:
+```javascript
+// Regex match
+db.users.find({email: {$regex: "@gmail.com$"}})
+
+// Case-insensitive regex
+db.users.find({
+  name: {$regex: "john", $options: "i"}
+})
+
+// Text search (requires text index)
+db.articles.find({$text: {$search: "mongodb tutorial"}})
+```
+
+### Projection
+
+**Include specific fields**:
+```javascript
+db.users.find({}, {name: 1, email: 1})
+// Returns: {_id, name, email}
+```
+
+**Exclude specific fields**:
+```javascript
+db.users.find({}, {password: 0, ssn: 0})
+// Returns: all fields except password and ssn
+```
+
+**Exclude _id**:
+```javascript
+db.users.find({}, {_id: 0, name: 1, email: 1})
+// Returns: {name, email}
+```
+
+### Sorting
+
+**Sort ascending**:
+```javascript
+db.users.find({}).sort({name: 1})
+```
+
+**Sort descending**:
+```javascript
+db.users.find({}).sort({created_at: -1})
+```
+
+**Multiple sort fields**:
+```javascript
+db.users.find({}).sort({status: 1, created_at: -1})
+```
+
+### Limiting and Skipping
+
+**Limit results**:
+```javascript
+db.users.find({}).limit(10)
+```
+
+**Skip results (pagination)**:
+```javascript
+db.users.find({}).skip(20).limit(10)
+// Page 3 (assuming 10 per page)
+```
+
+**Pagination example**:
+```javascript
+// Page 1
+db.users.find({}).limit(10)
+
+// Page 2
+db.users.find({}).skip(10).limit(10)
+
+// Page 3
+db.users.find({}).skip(20).limit(10)
+```
+
+## Aggregation Pipelines
+
+### Pipeline Basics
+
+Aggregation pipelines process documents through stages:
+
+```javascript
+db.collection.aggregate([
+  {$stage1: {}},
+  {$stage2: {}},
+  {$stage3: {}}
+])
+```
+
+### Common Stages
+
+**$match - Filter documents**:
+```javascript
+db.orders.aggregate([
+  {$match: {status: "completed"}}
+])
+```
+
+**$group - Group and aggregate**:
+```javascript
+db.orders.aggregate([
+  {$group: {
+    _id: "$customer_id",
+    total: {$sum: "$amount"},
+    count: {$sum: 1}
+  }}
+])
+```
+
+**$project - Reshape documents**:
+```javascript
+db.users.aggregate([
+  {$project: {
+    name: 1,
+    email: 1,
+    fullName: {$concat: ["$firstName", " ", "$lastName"]}
+  }}
+])
+```
+
+**$sort - Sort documents**:
+```javascript
+db.users.aggregate([
+  {$sort: {created_at: -1}}
+])
+```
+
+**$limit - Limit results**:
+```javascript
+db.users.aggregate([
+  {$limit: 10}
+])
+```
+
+**$skip - Skip documents**:
+```javascript
+db.users.aggregate([
+  {$skip: 20}
+])
+```
+
+**$unwind - Deconstruct arrays**:
+```javascript
+db.orders.aggregate([
+  {$unwind: "$items"}
+])
+```
+
+**$lookup - Join collections**:
+```javascript
+db.orders.aggregate([
+  {$lookup: {
+    from: "users",
+    localField: "user_id",
+    foreignField: "_id",
+    as: "user"
+  }}
+])
+```
+
+### Real-World Examples
+
+**Example 1: Revenue by Customer**
+```javascript
+db.orders.aggregate([
+  {$match: {status: "completed"}},
+  {$group: {
+    _id: "$customer_id",
+    totalRevenue: {$sum: "$amount"},
+    orderCount: {$sum: 1},
+    avgOrderValue: {$avg: "$amount"}
+  }},
+  {$sort: {totalRevenue: -1}},
+  {$limit: 10}
+])
+```
+
+**Example 2: Daily Active Users**
+```javascript
+db.events.aggregate([
+  {$match: {
+    event_type: "login",
+    timestamp: {$gte: ISODate("2024-01-01")}
+  }},
+  {$group: {
+    _id: {
+      $dateToString: {
+        format: "%Y-%m-%d",
+        date: "$timestamp"
+      }
+    },
+    uniqueUsers: {$addToSet: "$user_id"}
+  }},
+  {$project: {
+    date: "$_id",
+    userCount: {$size: "$uniqueUsers"}
+  }},
+  {$sort: {date: -1}}
+])
+```
+
+**Example 3: Product Performance**
+```javascript
+db.orders.aggregate([
+  {$unwind: "$items"},
+  {$group: {
+    _id: "$items.product_id",
+    totalSold: {$sum: "$items.quantity"},
+    revenue: {$sum: {$multiply: ["$items.price", "$items.quantity"]}},
+    avgPrice: {$avg: "$items.price"}
+  }},
+  {$lookup: {
+    from: "products",
+    localField: "_id",
+    foreignField: "_id",
+    as: "product"
+  }},
+  {$unwind: "$product"},
+  {$project: {
+    productName: "$product.name",
+    totalSold: 1,
+    revenue: 1,
+    avgPrice: 1
+  }},
+  {$sort: {revenue: -1}},
+  {$limit: 20}
+])
+```
+
+**Example 4: User Engagement Funnel**
+```javascript
+db.events.aggregate([
+  {$match: {
+    timestamp: {$gte: ISODate("2024-01-01")}
+  }},
+  {$group: {
+    _id: "$event_type",
+    count: {$sum: 1},
+    uniqueUsers: {$addToSet: "$user_id"}
+  }},
+  {$project: {
+    eventType: "$_id",
+    totalEvents: "$count",
+    uniqueUsers: {$size: "$uniqueUsers"}
+  }},
+  {$sort: {totalEvents: -1}}
+])
+```
+
+**Example 5: Time-Based Analysis**
+```javascript
+db.sales.aggregate([
+  {$match: {
+    date: {
+      $gte: ISODate("2024-01-01"),
+      $lt: ISODate("2024-12-31")
+    }
+  }},
+  {$group: {
+    _id: {
+      year: {$year: "$date"},
+      month: {$month: "$date"}
+    },
+    revenue: {$sum: "$amount"},
+    transactions: {$sum: 1}
+  }},
+  {$project: {
+    period: {
+      $concat: [
+        {$toString: "$_id.year"},
+        "-",
+        {$toString: "$_id.month"}
+      ]
+    },
+    revenue: 1,
+    transactions: 1,
+    avgTransaction: {$divide: ["$revenue", "$transactions"]}
+  }},
+  {$sort: {"_id.year": 1, "_id.month": 1}}
+])
+```
+
+## Filtering Workflows
+
+### Quick Filters
+
+Press `f` in document view for instant filtering:
+
+**Simple equality**:
+```json
+{"status": "active"}
+```
+
+**Multiple conditions**:
+```json
+{"status": "active", "role": "admin"}
+```
+
+**Nested fields**:
+```json
+{"address.city": "New York"}
+```
+
+**Array contains**:
+```json
+{"tags": "premium"}
+```
+
+### Advanced Filters
+
+**Date ranges**:
+```json
+{
+  "created_at": {
+    "$gte": {"$date": "2024-01-01T00:00:00Z"},
+    "$lt": {"$date": "2024-12-31T23:59:59Z"}
+  }
+}
+```
+
+**Regex patterns**:
+```json
+{"email": {"$regex": "@company\\.com$"}}
+```
+
+**Complex conditions**:
+```json
+{
+  "$or": [
+    {"status": "active"},
+    {"status": "pending"}
+  ],
+  "role": {"$in": ["admin", "moderator"]}
+}
+```
+
+### Filter Best Practices
+
+1. **Start simple, add complexity**:
+```json
+// Start
+{"status": "active"}
+
+// Add condition
+{"status": "active", "role": "admin"}
+
+// Add complexity
+{
+  "status": "active",
+  "role": "admin",
+  "created_at": {"$gte": {"$date": "2024-01-01"}}
+}
+```
+
+2. **Use indexes for performance**:
+```javascript
+// Ensure index exists
+db.users.createIndex({email: 1})
+
+// Then filter
+{"email": "user@example.com"}
+```
+
+3. **Test in query mode first**:
+```javascript
+// Test query
+db.users.find({status: "active"}).limit(5)
+
+// Then use in filter
+{"status": "active"}
+```
+
+## Export Workflows
+
+### Basic Export
+
+1. Navigate to documents or run query
+2. Press `e`
+3. Choose format (JSON/CSV/BSON)
+4. Enter filename
+5. Press Enter
+
+### Export Formats
+
+**JSON Export**:
+```bash
+# Exports as array of documents
+[
+  {"_id": "...", "name": "John", "email": "john@example.com"},
+  {"_id": "...", "name": "Jane", "email": "jane@example.com"}
+]
+```
+
+**CSV Export**:
+```csv
+_id,name,email
+507f1f77bcf86cd799439011,John,john@example.com
+507f1f77bcf86cd799439012,Jane,jane@example.com
+```
+
+**BSON Export**:
+```
+Binary format preserving MongoDB types
+```
+
+### Export Workflows
+
+**Workflow 1: Export Filtered Data**
+```
+1. Navigate to collection
+2. Press 'f'
+3. Enter filter: {"status": "active"}
+4. Press Enter
+5. Press 'e'
+6. Choose JSON
+7. Enter: active_users.json
+8. Press Enter
+```
+
+**Workflow 2: Export Query Results**
+```
+1. Navigate to collection
+2. Press 'q'
+3. Enter: db.users.find({role: "admin"}).sort({name: 1})
+4. Press Enter
+5. Press 'e'
+6. Choose CSV
+7. Enter: admins.csv
+8. Press Enter
+```
+
+**Workflow 3: Export Aggregation**
+```
+1. Navigate to collection
+2. Press 'q'
+3. Enter aggregation pipeline
+4. Press Enter
+5. Review results
+6. Press 'e'
+7. Choose JSON
+8. Enter: report.json
+9. Press Enter
+```
+
+### Export Tips
+
+1. **Filter before exporting** to reduce file size
+2. **Use CSV for spreadsheets** (Excel, Google Sheets)
+3. **Use JSON for code** (import into applications)
+4. **Use BSON for backups** (preserves types)
+
+## Performance Tips
+
+### Optimize Queries
+
+**Use indexes**:
+```javascript
+// Check existing indexes
+db.users.getIndexes()
+
+// Create index
+db.users.createIndex({email: 1})
+
+// Use indexed field in query
+db.users.find({email: "user@example.com"})
+```
+
+**Limit results**:
+```javascript
+// Always limit large queries
+db.users.find({}).limit(100)
+```
+
+**Use projection**:
+```javascript
+// Only fetch needed fields
+db.users.find({}, {name: 1, email: 1})
+```
+
+### Optimize Aggregations
+
+**Match early**:
+```javascript
+// Good: Filter first
+db.orders.aggregate([
+  {$match: {status: "completed"}},  // Reduces documents early
+  {$group: {_id: "$customer_id", total: {$sum: "$amount"}}}
+])
+
+// Bad: Filter late
+db.orders.aggregate([
+  {$group: {_id: "$customer_id", total: {$sum: "$amount"}}},
+  {$match: {total: {$gt: 100}}}  // Processes all documents first
+])
+```
+
+**Project early**:
+```javascript
+// Good: Reduce document size early
+db.users.aggregate([
+  {$project: {name: 1, email: 1}},  // Smaller documents
+  {$sort: {name: 1}}
+])
+```
+
+**Use allowDiskUse for large aggregations**:
+```javascript
+db.orders.aggregate([
+  {$group: {_id: "$product", total: {$sum: "$amount"}}}
+], {allowDiskUse: true})
+```
+
+## Troubleshooting
+
+### Query Errors
+
+**Syntax Error**:
+```
+Error: Unexpected token
+
+Solution: Check JSON syntax
+- Missing commas
+- Unmatched brackets
+- Unquoted strings
+```
+
+**Field Not Found**:
+```
+Error: Field 'xyz' not found
+
+Solution:
+- Check field name spelling
+- Check case sensitivity
+- Use dot notation for nested fields
+```
+
+**Type Mismatch**:
+```
+Error: Cannot compare string to number
+
+Solution:
+- Ensure correct data types
+- Use $type operator to check
+- Convert types if needed
+```
+
+### Performance Issues
+
+**Slow Queries**:
+```
+Solution:
+1. Add indexes on filter fields
+2. Use .explain() to analyze
+3. Limit results
+4. Use projection
+```
+
+**Memory Errors**:
+```
+Error: Exceeded memory limit
+
+Solution:
+1. Use allowDiskUse: true
+2. Add $limit stages
+3. Filter earlier in pipeline
+4. Process in batches
+```
+
+## Advanced Techniques
+
+### Conditional Aggregation
+
+```javascript
+db.orders.aggregate([
+  {$group: {
+    _id: "$status",
+    total: {$sum: "$amount"},
+    highValue: {
+      $sum: {
+        $cond: [{$gte: ["$amount", 1000]}, "$amount", 0]
+      }
+    }
+  }}
+])
+```
+
+### Array Aggregation
+
+```javascript
+db.products.aggregate([
+  {$project: {
+    name: 1,
+    avgRating: {$avg: "$reviews.rating"},
+    reviewCount: {$size: "$reviews"}
+  }}
+])
+```
+
+### Date Manipulation
+
+```javascript
+db.events.aggregate([
+  {$project: {
+    event: 1,
+    hour: {$hour: "$timestamp"},
+    dayOfWeek: {$dayOfWeek: "$timestamp"},
+    month: {$month: "$timestamp"}
+  }},
+  {$group: {
+    _id: "$hour",
+    events: {$sum: 1}
+  }}
+])
+```
+
+## Conclusion
+
+Mastering queries in Monjo-Kompass unlocks incredible productivity:
+
+- **Find queries** for simple lookups
+- **Aggregation pipelines** for complex analysis
+- **Filtering** for quick exploration
+- **Export** for sharing and analysis
+
+**Practice these workflows**:
+1. Start with simple finds
+2. Progress to complex filters
+3. Build aggregation pipelines
+4. Export and analyze results
+
+**Next Steps**:
+- Explore your own data
+- Build custom queries
+- Create reusable pipelines
+- Share your discoveries!
+
+Happy querying! 🚀

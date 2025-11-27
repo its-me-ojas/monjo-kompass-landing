@@ -12,14 +12,18 @@ export default function Footer() {
         
         <div className="flex items-center gap-6">
           <a
-            href="#"
+            href="https://github.com/its-me-ojas/monjo-kompass"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-white/40 hover:text-white transition-colors"
             aria-label="GitHub"
           >
             <Github className="w-5 h-5" />
           </a>
           <a
-            href="#"
+            href="https://x.com/ojvznx"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-white/40 hover:text-white transition-colors"
             aria-label="Twitter"
           >
