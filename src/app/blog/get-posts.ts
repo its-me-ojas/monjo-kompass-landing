@@ -8,7 +8,7 @@ export async function getPosts() {
   
   let posts: any[] = []
   
-  if (blogFolder && blogFolder.children) {
+  if (blogFolder && 'children' in blogFolder && blogFolder.children) {
     posts = blogFolder.children
       .filter((item: any) => {
         return item.frontMatter && item.route !== '/blog'
